@@ -7,7 +7,6 @@ jobs:
   run-nodegoat:
     runs-on: ubuntu-latest
 
-    # NodeGoat එකට අවශ්‍ය MongoDB ඩේටාබේස් සර්විස් එක මෙතැනින් ස්වයංක්‍රීයව ක්‍රියාත්මක වේ
     services:
       mongodb:
         image: mongo:latest
@@ -33,7 +32,8 @@ jobs:
           PORT: 4000
           MONGODB_URI: mongodb://localhost:27017/nodegoat
 
-      - name: Expose Server using Tunnel
+      - name: Expose Server using Cloudflare
         run: |
-          npx localtunnel --port 4000
-
+          curl -L --output cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared
+          ./cloudflared tunnel --url http://localhost:4000

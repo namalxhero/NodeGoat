@@ -1,0 +1,39 @@
+name: Run NodeGoat Live
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-nodegoat:
+    runs-on: ubuntu-latest
+
+    # NodeGoat එකට අවශ්‍ය MongoDB ඩේටාබේස් සර්විස් එක මෙතැනින් ස්වයංක්‍රීයව ක්‍රියාත්මක වේ
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Start NodeGoat Server in Background
+        run: |
+          npm start &
+        env:
+          PORT: 4000
+          MONGODB_URI: mongodb://localhost:27017/nodegoat
+
+      - name: Expose Server using Tunnel
+        run: |
+          npx localtunnel --port 4000
+
